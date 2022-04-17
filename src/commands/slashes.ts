@@ -1,14 +1,14 @@
 import { RateLimit, TIME_UNIT } from "@discordx/utilities";
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { Discord, Guard, Slash, SlashChoice, SlashOption } from "discordx";
-import { airdrop } from "../services/faucet.js";
+import { airdrop, getBalance } from "../services/faucet.js";
 import {
 	BalanceResponse,
 	TheBlockChainApi,
 } from "../services/theblockchainapi.js";
 
 // rich balance in lamport
-const RICHBAL = 1e9;
+const RICHBAL = 1;
 // no funds image
 const noFunds = new MessageEmbed({
 	title: "No funds available on Mainnet",
@@ -75,26 +75,26 @@ export abstract class SlashExample {
 		network: "devnet" | "testnet" | "mainnet-beta",
 		interaction: CommandInteraction
 	): Promise<void> {
+		if (!network) network = "devnet"
 		await interaction.deferReply();
 		// if network is mainnet then send mainnet no fund image
 		if (network === "mainnet-beta") {
 			await interaction.editReply({ embeds: [noFunds] });
 			return;
 		}
-
-		// get balance
-		const balance = await BApi.getBalance(address, network);
-		// check error
-		const error = balance as any;
-		if (error.errors) {
-			showError(error.errors[0].msg, interaction);
-			return 
-		}
-		const bal = balance as BalanceResponse;
-		// check balance is greater than rich balance
-		if (toSol(bal.balance) > RICHBAL) {
-			const richEmbed = RichEmbed(bal);
-			await interaction.editReply({ embeds: [richEmbed] });
+		try {
+			// get balance
+			const balance = await getBalance(address, network);
+			console.log("balance",balance);
+			const bal = balance as BalanceResponse;
+			// check balance is greater than rich balance
+			if (bal.balance > RICHBAL) {
+				const richEmbed = RichEmbed(bal);
+				await interaction.editReply({ embeds: [richEmbed] });
+				return;
+			}
+		} catch (error:any) {
+			await showError(error.message, interaction);
 			return;
 		}
 		// send airdrop
@@ -110,17 +110,20 @@ export abstract class SlashExample {
 					});
 					await interaction.editReply({ embeds: [embed] });
 				}
-				if (val.state=="success"){
-					const dis = `Airdropped ${val.amount} lamport to ${formatAddress(
+				if (val.state=="done"){
+					const dis = `Airdropped ${val.amount} SOL to ${formatAddress(
 						address
 					)}`
 					const embed = new MessageEmbed({
-						title: "Airdrop",
+						title: "Airdrop was successful",
+						description: dis,
 						color: "#DE1738",
 					});
-					embed.addField("Airdrop was successful.",dis)
-					embed.addField("View on Sol Explorer",val.message)
-					await interaction.editReply({ embeds: [embed] });
+					const linkButton = new MessageButton();
+					linkButton.setLabel("View on Solana Explorer").setStyle("LINK").setURL(val.message)
+					const actionrow = new MessageActionRow();
+					actionrow.addComponents(linkButton);
+					await interaction.editReply({ embeds: [embed] ,components: [actionrow] });
 				}
 			}
 			return;
@@ -129,20 +132,12 @@ export abstract class SlashExample {
 			await interaction.editReply({ embeds: [ErrorEmbed(e.message)] });
 			return 
 		} 
-		
-		const embed = new MessageEmbed({
-			title: "Balance for " + formatAddress(address),
-			color: "#DE1738",
-		});
-		embed.addField("Lamports", `${bal.balance}`);
-		embed.addField("Sol", `${toSol(bal.balance)}`);
-		interaction.editReply({ embeds: [embed] });
 	}
 }
 function RichEmbed(bal: BalanceResponse) {
 	return new MessageEmbed({
 		title: "You have enough funds",
-		description: `You have ${toSol(bal.balance)} lamport`,
+		description: `You have ${bal.balance} SOL`,
 		color: "#DE1738",
 	});
 }

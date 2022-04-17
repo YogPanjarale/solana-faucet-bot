@@ -5,12 +5,13 @@ const funds: Record<string, number> = {
 	devnet: 0.1,
 	testnet: 0.5,
 };
+export const PAYER = "4MywjWfWyqYs9bcABMkubeYz28XgR1eJ8589GtRTNDtZ";
+const PVKEY = process.env.PAYER_PRIVATE_KEY!;
 export async function* airdrop(receiver: string, environment: string) {
 	//mainnet-beta, testnet, devnet
 	const network = `https://api.${environment}.solana.com`;
-	// const network = `https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899`;
 	console.log(`Connecting to ${network}`);
-	const payer = "HaYr2syE3jfMC5EmetTHb8VfTwijenUcjv69zcTnWhNL"; // public key of payer address
+	const payer = PAYER; // public key of payer address
 	const solTotal = funds[environment];
 	const fromPubkey = new PublicKey(payer);
 	const toPubkey = new PublicKey(receiver);
@@ -28,8 +29,7 @@ export async function* airdrop(receiver: string, environment: string) {
 	} = await connection.getRecentBlockhash();
 	transaction.recentBlockhash = blockhash;
 	transaction.feePayer = new PublicKey(payer);
-	const pvkey: string =
-		"3gGHosrFnjYNpaHPm4csdUt6D3utkqpgLVVdmQR8xExU1eM8o4tYtMQQJSBh1xGHxHwH9s3cmaDLXkWK89BdB5Zf"; //private key of payer address
+	const pvkey: string = PVKEY; //private key of payer address
 	const buf = bs58.decode(pvkey);
 	const secretKey: Uint8Array = buf;
 	console.log(Keypair.generate().secretKey);
@@ -55,15 +55,28 @@ export async function* airdrop(receiver: string, environment: string) {
 			signers
 		);
 		console.log(
-			`https://solscan.io/tx/${confirmation}?cluster=${environment}`
+			`https://explorer.solana.com/tx/${confirmation}?cluster=${environment}`
 		);
+
 		return {
 			state: "done",
-			message: `https://solscan.io/tx/${confirmation}?cluster=${environment}`,
-			amount: solTotal * 1e-9,
+			message: `https://explorer.solana.com/tx/${confirmation}?cluster=${environment}`,
+			amount: solTotal,
 		};
 	} catch (error: any) {
 		console.log(error);
 		throw new Error(error || "Error in transaction");
+	}
+}
+
+export async function getBalance(address:string,network:string){
+	// network url
+	const url = `https://api.${network}.solana.com`;
+	// connection
+	const connection = new Connection(url,"confirmed");
+	
+	const balance = await connection.getBalance(new PublicKey(address));
+	return {
+		balance: balance / 1e9,
 	}
 }
