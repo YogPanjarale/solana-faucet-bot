@@ -1,4 +1,6 @@
 export  class Memes {
+    memes = process.env.SHOW_MEMES || true;
+    
     richGuyMemes = [
         "https://cdn.discordapp.com/attachments/954398254236315691/965276709647691846/IMG_20220417_211148.jpg",
         "https://cdn.discordapp.com/attachments/954398254236315691/965276709870010418/images_69.jpeg",
@@ -16,7 +18,6 @@ export  class Memes {
         "https://cdn.discordapp.com/attachments/954398254236315691/965278129327333396/bhnzit1p1i881.jpg"
     ]
     mainNetDefault = "https://cdn.discordapp.com/attachments/958293505065758760/965581194362228766/unknown.png"
-    memes = process.env.SHOW_MEMES || true;
     constructor() {
         
     }

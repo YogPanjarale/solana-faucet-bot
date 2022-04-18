@@ -2,13 +2,9 @@ import { RateLimit, TIME_UNIT } from "@discordx/utilities";
 import { CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { Discord, Guard, Slash, SlashChoice, SlashOption } from "discordx";
 import { LOWBAL, memeImages, RICHBAL } from "../constants.js";
+import { checkCanUseCommand, updateUser } from "../services/db.js";
 import { airdrop, getBalance, PAYER } from "../services/faucet.js";
 import { Memes } from "../services/memes.js";
-import {
-	BalanceResponse,
-	TheBlockChainApi,
-} from "../services/theblockchainapi.js";
-
 
 const memes = new Memes()
 
@@ -37,10 +33,6 @@ const checkValidAddress = (address: string) => {
 	const isBase58 = base58.test(address);
 	return length44 && isBase58;
 };
-const BApi = new TheBlockChainApi(
-	process.env.API_KEY_ID || "",
-	process.env.API_KEY_SECRET || ""
-);
 const ErrorEmbed = (err: string) =>
 	new MessageEmbed({ title: "Error", description: err, color: "#DE1738" });
 
@@ -58,9 +50,14 @@ const showError = async (error: string, interaction: CommandInteraction) => {
 
 @Discord()
 export abstract class SlashExample {
-	@Guard(RateLimit(TIME_UNIT.seconds, 10))
 	@Slash("ping")
 	async ping(interaction: CommandInteraction): Promise<void> {
+		const {can,timeout, after} = await checkCanUseCommand(interaction.member?.user.id||"no","no");
+		if (!can) {
+			await ShowCoolDown(after, timeout, interaction);
+			return;
+		}
+		await updateUser(interaction.member?.user.id||"no","no");
 		interaction.reply("pong!");
 	}
 	@Slash("mainnet")
@@ -129,6 +126,14 @@ export abstract class SlashExample {
 			await showError("Invalid address", interaction);
 			return;
 		}
+		
+		// check cooldown
+		const { can, timeout, after } = await checkCanUseCommand(interaction.member?.user.id||"no",network);
+		if (!can) {
+			await ShowCoolDown(after, timeout, interaction);
+			return;
+		}
+
 		if (!network) network = "devnet"
 		await interaction.deferReply();
 		// if network is mainnet then send mainnet no fund image
@@ -140,7 +145,7 @@ export abstract class SlashExample {
 			// get balance
 			const balance = await getBalance(address, network);
 			console.log("balance",balance);
-			const bal = balance as BalanceResponse;
+			const bal = balance as any;
 			// check balance is greater than rich balance
 			if (bal.balance > RICHBAL) {
 				const richEmbed = new MessageEmbed({
@@ -199,6 +204,8 @@ export abstract class SlashExample {
 					const actionrow = new MessageActionRow();
 					actionrow.addComponents(linkButton);
 					await interaction.editReply({ embeds: [embed] ,components: [actionrow] });
+					// update user
+					await updateUser(interaction.member?.user.id||"no",network);
 				}
 			}
 			return;
@@ -207,6 +214,20 @@ export abstract class SlashExample {
 			await interaction.editReply({ embeds: [ErrorEmbed(e.message)] });
 			return 
 		} 
+	}
+}
+
+async function ShowCoolDown(after: number, timeout: number, interaction:CommandInteraction) {
+	const time = after > 60000 ? `${Math.floor(after / 60000)} minutes` : `${Math.floor(after / 1000)} seconds`;
+	const embed = new MessageEmbed({
+		title: "Command Cooldown",
+		description: `You can only request funds once every ${timeout} minutes. Try again in ${time}`,
+		color: "#DE1738",
+	});
+	if (interaction.replied){
+		await interaction.editReply({ embeds: [embed] });
+	}else{
+		await interaction.reply({ embeds: [embed] });
 	}
 }
 
