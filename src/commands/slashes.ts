@@ -60,7 +60,7 @@ export abstract class SlashExample {
 		await updateUser(interaction.member?.user.id||"no","no");
 		interaction.reply("pong!");
 	}
-	@Slash("mainnet")
+	// @Slash("mainnet")
 	async mainnet(interaction: CommandInteraction): Promise<void> {
 		// reply with noFunds embed
 		await interaction.deferReply();
@@ -74,10 +74,11 @@ export abstract class SlashExample {
 	}
 	@Slash("balance")
 	async balance(
-		@SlashOption("address",{required:false}) address: string,
+		// @SlashOption("address",{required:false}) address: string,
 		
 		interaction: CommandInteraction
 	): Promise<void> {
+		let address
 		if (!address) {
 			address = PAYER;
 		}
@@ -111,6 +112,10 @@ export abstract class SlashExample {
 				`${balances[network]} SOL`,
 			);
 		}
+		embed.addField(
+			"Donate",
+			PAYER
+		)
 		await interaction.editReply({ embeds: [embed] });
 		
 	}
@@ -138,7 +143,13 @@ export abstract class SlashExample {
 		await interaction.deferReply();
 		// if network is mainnet then send mainnet no fund image
 		if (network === "mainnet-beta") {
-			await interaction.editReply({ embeds: [noFunds] });
+			const embed = new MessageEmbed({
+				title:":eyes:",
+				image: {
+					url: memes.getMainNetMeme(),
+				},
+			});
+			await interaction.editReply({ embeds: [embed] });
 			return;
 		}
 		try {
@@ -179,7 +190,7 @@ export abstract class SlashExample {
 				const val = (await airdropResponse.next()).value;
 				if (val.state=="processing"){
 					const embed = new MessageEmbed({
-						title: "Airdrop is processing. Please wait.",
+						title: "Airdrop is processing. Please wait. <:emoji_3:965171012641624065>",
 						color: "#DE1738",
 						thumbnail:{
 							url: "https://cdn.discordapp.com/attachments/958293505065758760/965211329948438548/9c065ee7-89c1-4ba7-a238-7b466b85b4a9.gif",
