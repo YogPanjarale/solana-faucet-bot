@@ -19,7 +19,8 @@ Easily fund your SOL account on devnet/testnet.
     ```
 
 3. copy env.example to .env / or you can set system environment variables
-    ![image](https://user-images.githubusercontent.com/64301340/163817348-09df70a0-3a12-4861-8ba3-79d490e02345.png)
+    ![image](https://cdn.discordapp.com/attachments/958293505065758760/965650758089474098/unknown.png)
+
     ```sh
     cp .env.example .env
     ```
