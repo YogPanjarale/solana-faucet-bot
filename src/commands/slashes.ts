@@ -60,18 +60,7 @@ export abstract class SlashExample {
 		await updateUser(interaction.member?.user.id||"no","no");
 		interaction.reply("pong!");
 	}
-	// @Slash("mainnet")
-	async mainnet(interaction: CommandInteraction): Promise<void> {
-		// reply with noFunds embed
-		await interaction.deferReply();
-		const embed = new MessageEmbed({
-			title:":eyes:",
-			image: {
-				url: memes.getMainNetMeme(),
-			},
-		});
-		await interaction.editReply({ embeds: [embed] });
-	}
+	
 	@Slash("balance")
 	async balance(
 		// @SlashOption("address",{required:false}) address: string,

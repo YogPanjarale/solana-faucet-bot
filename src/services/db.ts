@@ -34,5 +34,7 @@ export const getLastUsed = async (userId: string, network: string) => {
 	};
 };
 export const updateUser = async (userId: string, network: string) => {
-	return await redis.set(makeKey(userId, network), Date.now());
+	await redis.set(makeKey(userId, network), Date.now());
+	console.log(`Updated user ${userId} on network ${network} to ${Date.now()}`);
+	
 };
