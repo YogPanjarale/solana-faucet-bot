@@ -60,7 +60,7 @@ export async function* airdrop(receiver: string, environment: string) {
 
 		return {
 			state: "done",
-			message: `https://solscan.io//tx/${confirmation}?cluster=${environment}`,
+			message: `https://solscan.io/tx/${confirmation}?cluster=${environment}`,
 			amount: solTotal,
 		};
 	} catch (error: any) {
