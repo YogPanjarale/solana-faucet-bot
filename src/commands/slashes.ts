@@ -104,7 +104,7 @@ export abstract class SlashExample {
 		}
 		const embed = new MessageEmbed({
 			title: "Balance",
-			description: `${formatAddress(address)}`,
+			// description: `${formatAddress(address)}`,
 		});
 		for (const network in balances) {
 			embed.addField(

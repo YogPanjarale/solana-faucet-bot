@@ -9,7 +9,8 @@ export const PAYER = "4MywjWfWyqYs9bcABMkubeYz28XgR1eJ8589GtRTNDtZ";
 const PVKEY = process.env.PAYER_PRIVATE_KEY!;
 export async function* airdrop(receiver: string, environment: string) {
 	//mainnet-beta, testnet, devnet
-	const network = `https://api.${environment}.solana.com`;
+	const network = getNetwork(environment);
+
 	console.log(`Connecting to ${network}`);
 	const payer = PAYER; // public key of payer address
 	const solTotal = funds[environment];
@@ -69,9 +70,13 @@ export async function* airdrop(receiver: string, environment: string) {
 	}
 }
 
+function getNetwork(environment: string) {
+	return `https://api.${environment}.solana.com`;
+}
+
 export async function getBalance(address:string,network:string){
 	// network url
-	const url = `https://api.${network}.solana.com`;
+	const url = getNetwork(network);
 	// connection
 	const connection = new Connection(url,"confirmed");
 	

@@ -1,5 +1,5 @@
 export  class Memes {
-    memes = process.env.SHOW_MEMES || true;
+    memes = JSON.parse(process.env.SHOW_MEMES?.toLowerCase() || "true");
     
     richGuyMemes = [
         "https://cdn.discordapp.com/attachments/954398254236315691/965276709647691846/IMG_20220417_211148.jpg",
@@ -19,6 +19,7 @@ export  class Memes {
     ]
     mainNetDefault = "https://cdn.discordapp.com/attachments/958293505065758760/965581194362228766/unknown.png"
     constructor() {
+        console.log("Showing memes: " + this.memes);
         
     }
     getRichGuyMeme() {
