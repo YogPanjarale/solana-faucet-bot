@@ -190,11 +190,11 @@ export abstract class SlashExample {
 				const val = (await airdropResponse.next()).value;
 				if (val.state=="processing"){
 					const embed = new MessageEmbed({
-						title: "Airdrop is processing. Please wait. <:emoji_3:965171012641624065>",
+						title: "Airdrop is processing. Please wait. <:loading:965627633192812544>",
 						color: "#DE1738",
-						thumbnail:{
-							url: "https://cdn.discordapp.com/attachments/958293505065758760/965211329948438548/9c065ee7-89c1-4ba7-a238-7b466b85b4a9.gif",
-						}
+						// thumbnail:{
+						// 	url: "https://cdn.discordapp.com/attachments/958293505065758760/965211329948438548/9c065ee7-89c1-4ba7-a238-7b466b85b4a9.gif",
+						// }
 					});
 					await interaction.editReply({ embeds: [embed] });
 				}
@@ -203,12 +203,12 @@ export abstract class SlashExample {
 						address
 					)}`
 					const embed = new MessageEmbed({
-						title: "Airdrop was successful",
+						title: "Airdrop was successful <:tick:965171012641624065>",
 						description: dis,
 						color: "#DE1738",
-						thumbnail:{
-							url: "https://cdn.discordapp.com/attachments/958293505065758760/965211430037106688/120f96fa-8ea7-4b7b-9445-3b3911cfaff4.gif",
-						}
+						// thumbnail:{
+						// 	url: "https://cdn.discordapp.com/attachments/958293505065758760/965211430037106688/120f96fa-8ea7-4b7b-9445-3b3911cfaff4.gif",
+						// }
 					});
 					const linkButton = new MessageButton();
 					linkButton.setLabel("View on solscan").setStyle("LINK").setURL(val.message)
