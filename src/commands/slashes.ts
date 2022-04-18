@@ -3,17 +3,20 @@ import { CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } fro
 import { Discord, Guard, Slash, SlashChoice, SlashOption } from "discordx";
 import { LOWBAL, memeImages, RICHBAL } from "../constants.js";
 import { airdrop, getBalance, PAYER } from "../services/faucet.js";
+import { Memes } from "../services/memes.js";
 import {
 	BalanceResponse,
 	TheBlockChainApi,
 } from "../services/theblockchainapi.js";
 
 
+const memes = new Memes()
+
 // no funds image
 const noFunds = new MessageEmbed({
 	title: "Low on funds :(",
 	image: {
-		url: memeImages[Math.floor(Math.random() * memeImages.length)],
+		url: memes.getLowBalanceMeme(),
 	},
 });
 const formatAddress = (address: string) => {
@@ -65,9 +68,9 @@ export abstract class SlashExample {
 		// reply with noFunds embed
 		await interaction.deferReply();
 		const embed = new MessageEmbed({
-			title:"Low on funds :(",
+			title:":eyes:",
 			image: {
-				url: memeImages[Math.floor(Math.random() * memeImages.length)],
+				url: memes.getMainNetMeme(),
 			},
 		});
 		await interaction.editReply({ embeds: [embed] });
@@ -143,9 +146,7 @@ export abstract class SlashExample {
 				const richEmbed = new MessageEmbed({
 					title: "You have more than enough funds, better consider donating some here",
 					url:`https://solscan.io/address/${PAYER}`,
-					thumbnail:{
-						url:"https://cdn.discordapp.com/emojis/865518028979437599.webp?size=128&quality=lossless"
-					}
+					image:{url:memes.getRichGuyMeme()},
 				});
 
 				await interaction.editReply({ embeds: [richEmbed] });
@@ -176,7 +177,7 @@ export abstract class SlashExample {
 						title: "Airdrop is processing. Please wait.",
 						color: "#DE1738",
 						thumbnail:{
-							url: "https://c.tenor.com/hRBZHp-kE0MAAAAC/loading-circle-loading.gif",
+							url: "https://cdn.discordapp.com/attachments/958293505065758760/965211329948438548/9c065ee7-89c1-4ba7-a238-7b466b85b4a9.gif",
 						}
 					});
 					await interaction.editReply({ embeds: [embed] });
@@ -189,6 +190,9 @@ export abstract class SlashExample {
 						title: "Airdrop was successful",
 						description: dis,
 						color: "#DE1738",
+						thumbnail:{
+							url: "https://cdn.discordapp.com/attachments/958293505065758760/965211430037106688/120f96fa-8ea7-4b7b-9445-3b3911cfaff4.gif",
+						}
 					});
 					const linkButton = new MessageButton();
 					linkButton.setLabel("View on solscan").setStyle("LINK").setURL(val.message)
