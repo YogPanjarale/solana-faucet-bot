@@ -31,3 +31,7 @@ Easily fund your SOL account on devnet/testnet.
     cd solana-faucet-bot // optional 
     npm run dev
     ```
+
+-- Note
+make sure to check this intents for the bot
+![image](https://user-images.githubusercontent.com/64301340/168212970-b929266b-e922-44a8-a643-3566d935feed.png)
